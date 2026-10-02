@@ -58,19 +58,15 @@ class BuildingFortficationsCore extends BaseBuildingBase
 					int EnableLogging = GetBuildingFortificationsConfig().Enable_Destroy_Logs;
 					if(EnableLogging >= 1)
 					{
-						string FirstHalf = player.GetIdentity().GetName() + " (GUID: " +  player.GetIdentity().GetId() + ")" + " Shot From: " + distance + "m" + " with Weapon =: "+ source.GetDisplayName() + " at " + this.GetDisplayName();
-						string SecondHalf = " Damage Done: " + resultingDamage + " To Zone Part: " + zoneName + "  Current Health: " + GetHealth(zoneName, "Health") + " at Postion: " + this.GetPosition();
-						if (resultingDamage > 0)
+						// DayZRP 2026-10-02: the log line is built only once the player and
+						// identity are known to exist. Upstream built it before the check, so a
+						// hit with no player behind it (zombie, explosion) dereferenced null.
+						if (resultingDamage > 0 && player && player.GetIdentity())
 						{
-							if (player && player.GetIdentity())
-							{
-								GetGame().AdminLog(FirstHalf + SecondHalf);
-							}
-							else
-							{
-								GetGame().AdminLog(FirstHalf + SecondHalf);
-							}
-						}	
+							string FirstHalf = player.GetIdentity().GetName() + " (GUID: " +  player.GetIdentity().GetId() + ")" + " Shot From: " + distance + "m" + " with Weapon =: "+ source.GetDisplayName() + " at " + this.GetDisplayName();
+							string SecondHalf = " Damage Done: " + resultingDamage + " To Zone Part: " + zoneName + "  Current Health: " + GetHealth(zoneName, "Health") + " at Postion: " + this.GetPosition();
+							GetGame().AdminLog(FirstHalf + SecondHalf);
+						}
 					}
 				}
 			}

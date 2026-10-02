@@ -1,3 +1,19 @@
+# DayZRP fork
+
+This is the DayZRP community's fork of Building Fortifications by Dumpgrah and DeamonForge
+(original mod: https://steamcommunity.com/sharedfiles/filedetails/?id=2670506982, original
+source: https://github.com/Dumpgrah/Public-BuildingFortification). DayZRP builds it into its
+server mod pack from this repository, under the same GNU AGPL 3.0 licence. All credit for the
+mod goes to its authors; please report problems with this build to DayZRP, not to them.
+
+Changes from the original, newest first:
+
+- 2026-10-02: `BuildingFortificationsCore.c` `EEHitBy`: the damage log line is built only
+  after the attacking player and their identity are checked, so damage with no player behind
+  it no longer causes a null-reference error.
+
+---
+
 # Public-Building-Fortifications
 
 This mod is Open source and free to use under the GNU AGPL 3.0 License v3.0. The mod offers currently the ability to build base-building objects for closing off doorways and windows, while allowing the taking over of vanilla building in DayZ 
