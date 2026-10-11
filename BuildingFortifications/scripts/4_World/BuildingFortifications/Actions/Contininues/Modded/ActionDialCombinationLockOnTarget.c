@@ -1,5 +1,41 @@
 modded class ActionDialCombinationLockOnTarget
 {
+#ifdef DAYZ_1_30
+	// DayZRP fork: 1.30 dials a lock from the side the player faces and no longer
+	// drops it on the right code, which needs the new lock selections a BF
+	// barricade does not have. Only a lock on a BF barricade keeps the old
+	// behaviour; every other lock is vanilla's.
+	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
+	{
+		if (!target.GetObject())
+			return false;
+
+		CombinationLock lock = CombinationLock.Cast( target.GetObject() );
+		if ( lock && BuildingFortficationsCore.Cast( lock.GetHierarchyParent() ) )
+		{
+			ConstructionActionData construction_action_data = player.GetConstructionActionData();
+			construction_action_data.SetCombinationLock( lock );
+			construction_action_data.SetCombinationLockSide( CombinationLock.FACING_OUTSIDE );
+			return true;
+		}
+		return super.ActionCondition( player, target, item );
+	}
+
+	override void OnFinishProgressServer( ActionData action_data )
+	{
+		ConstructionActionData constructionActionData = action_data.m_Player.GetConstructionActionData();
+		CombinationLock combination_lock = constructionActionData.GetCombinationLock();
+		if ( !combination_lock || !BuildingFortficationsCore.Cast( combination_lock.GetHierarchyParent() ) )
+		{
+			super.OnFinishProgressServer( action_data );
+			return;
+		}
+
+		combination_lock.DialNextNumber();
+		if ( !combination_lock.IsLockedOnGate() )
+			combination_lock.UnlockServer( action_data.m_Player, combination_lock.GetHierarchyParent() );
+	}
+#else
 	override bool ActionCondition ( PlayerBase player, ActionTarget target, ItemBase item )
 	{
 		if (!target.GetObject())
@@ -42,4 +78,5 @@ modded class ActionDialCombinationLockOnTarget
 			}
 		}
 	}
+#endif
 }

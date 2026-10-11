@@ -1,38 +1,56 @@
 
 modded class CombinationLock
 {
+	// DayZRP fork: a BF barricade takes the lock off itself. DayZ 1.30 replaced the
+	// vanilla UnlockServer with UnlockOnServer, so both versions route through here.
+	protected bool BF_UnlockFromBarricade( EntityAI player, EntityAI parent )
+	{
+		if ( !BF_DoorBarricade.Cast( parent ) && !BF_DoubleDoorBarricade.Cast( parent ) )
+			return false;
+
+		if ( IsLockAttached() )
+		{
+			InventoryLocation inventory_location = new InventoryLocation;
+			GetInventory().GetCurrentInventoryLocation( inventory_location );
+			parent.GetInventory().SetSlotLock( inventory_location.GetSlot(), false );
+
+			if (player)
+			{
+				player.ServerDropEntity( this );
+				SetPosition( player.GetPosition() );
+			}
+			else
+				parent.GetInventory().DropEntity(InventoryMode.SERVER, parent, this);
+			PlaceOnSurface();
+
+			m_LockActionPerformed = LockAction.UNLOCKED;
+			SetTakeable(true);
+			CheckLockedStateServer();
+			Synchronize();
+		}
+		return true;
+	}
+
+#ifdef DAYZ_1_30
+	override void UnlockOnServer( EntityAI player, EntityAI parent, bool isInsideLock = false )
+	{
+		if ( !BF_UnlockFromBarricade( player, parent ) )
+			super.UnlockOnServer( player, parent, isInsideLock );
+	}
+
+	// Removed from vanilla in 1.30; the barricades and actions here still call it.
+	void UnlockServer( EntityAI player, EntityAI parent )
+	{
+		UnlockOnServer( player, parent );
+	}
+#else
 	override void UnlockServer( EntityAI player, EntityAI parent )
 	{
-		BF_DoorBarricade BF_DB = BF_DoorBarricade.Cast( parent );
-		BF_DoubleDoorBarricade BF_DDB = BF_DoubleDoorBarricade.Cast( parent );
-		
-		if ( BF_DB || BF_DDB)
-		{
-			if ( IsLockAttached() )
-			{				
-				InventoryLocation inventory_location = new InventoryLocation;
-				GetInventory().GetCurrentInventoryLocation( inventory_location );			
-				BF_DB.GetInventory().SetSlotLock( inventory_location.GetSlot(), false );
-				BF_DDB.GetInventory().SetSlotLock( inventory_location.GetSlot(), false );
-		
-				if (player)
-					player.ServerDropEntity( this );
-				else
-					parent.GetInventory().DropEntity(InventoryMode.SERVER, parent, this);
-				SetPosition( player.GetPosition() );
-				PlaceOnSurface();
-				
-				m_LockActionPerformed = LockAction.UNLOCKED;
-				SetTakeable(true);
-				CheckLockedStateServer();
-				Synchronize();
-			};
-		}
-		else
-		{
-			super.UnlockServer(player, parent );
-		};		
+		if ( !BF_UnlockFromBarricade( player, parent ) )
+			super.UnlockServer( player, parent );
 	}
+#endif
+
 	override bool IsLockedOnGate()
 	{
 		BF_DoorBarricade BF_DB = BF_DoorBarricade.Cast( GetHierarchyParent() );
