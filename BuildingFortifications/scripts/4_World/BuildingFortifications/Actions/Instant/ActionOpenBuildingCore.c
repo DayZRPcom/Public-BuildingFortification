@@ -90,9 +90,9 @@ class ActionOpenBuildingCore: ActionInteractBase
         PlayerBase player = action_data.m_Player;
         PlayerIdentity identity = player.GetIdentity();
 		BuildingFortficationsCore fence = BuildingFortficationsCore.Cast( action_data.m_Target.GetObject() );
-		CodeLock codelockRS;
 	
 		#ifdef CodeLock 
+		CodeLock codelockRS;
 	        
        	 	codelockRS = CodeLock.Cast(fence.GetCodeLockRS());
 	
