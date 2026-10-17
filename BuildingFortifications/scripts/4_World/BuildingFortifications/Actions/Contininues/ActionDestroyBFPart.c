@@ -73,9 +73,13 @@ class ActionDestroyBFPart: ActionContinuousBase
 	override void OnFinishProgressServer( ActionData action_data )
 	{	
 		BuildingFortficationsCore base_building = BuildingFortficationsCore.Cast( action_data.m_Target.GetObject() );
+		if ( !base_building )
+			return;
 		Construction construction = base_building.GetConstruction();
 		ConstructionActionData construction_action_data = action_data.m_Player.GetConstructionActionData();
 		ConstructionPart construction_part = construction_action_data.GetTargetPart();
+		if ( !construction || !construction_part )
+			return;
 
 		
 		if ( construction.CanDestroyPart( construction_part.GetPartName() ) )
@@ -91,7 +95,7 @@ class ActionDestroyBFPart: ActionContinuousBase
 		int EnableLogging = GetBuildingFortificationsConfig().Enable_Destroy_Logs;
 		if(	EnableLogging >= 1 )
 		{
-			PlayerBase player;
+			PlayerBase player = action_data.m_Player;
 			string Firsthalf = player.GetIdentity().GetName() + " (GUID: " +  player.GetIdentity().GetId() + ") " + " Destroyed" + action_data.m_Target.GetObject().GetDisplayName();
 			string SecondHalf = " With " + action_data.m_MainItem.GetDisplayName() + " at Postion: " + action_data.m_Target.GetObject().GetPosition();
 	
@@ -107,8 +111,13 @@ class ActionDestroyBFPart: ActionContinuousBase
 			if ( target_object && target_object.CanUseConstruction() )
 			{
 				string part_name = target_object.GetActionComponentName( target.GetComponentIndex() );
+				//CanUseConstruction() can be true on objects that are not BaseBuildingBase
 				BaseBuildingBase base_building = BaseBuildingBase.Cast( target_object );
-				Construction construction = base_building.GetConstruction();		
+				if ( !base_building )
+					return false;
+				Construction construction = base_building.GetConstruction();
+				if ( !construction )
+					return false;
 				ConstructionPart construction_part = construction.GetConstructionPartToDestroy( part_name );
 				BuildingFortficationsCore NDBase = BuildingFortficationsCore.Cast( target.GetObject() );
 				

@@ -10,15 +10,20 @@ modded class ActionDismantlePart
 			if ( target_object && target_object.CanUseConstruction() )
 			{
 				//invalid if is gate and is locked
-				if ( Class.CastTo(target_entity,target_object) && (target_entity.FindAttachmentBySlotName("Att_CombinationLock") || target_entity.FindAttachmentBySlotName("Material_FPole_Flag")) || target_entity.FindAttachmentBySlotName("CrossBoard")) 
+				if ( Class.CastTo(target_entity,target_object) && (target_entity.FindAttachmentBySlotName("Att_CombinationLock") || target_entity.FindAttachmentBySlotName("Material_FPole_Flag") || target_entity.FindAttachmentBySlotName("CrossBoard")) )
 				{
 					return false;
 				}
 				
 				string part_name = target_object.GetActionComponentName( target.GetComponentIndex() );
 				
+				//CanUseConstruction() can be true on objects that are not BaseBuildingBase
 				BaseBuildingBase base_building = BaseBuildingBase.Cast( target_object );
-				Construction construction = base_building.GetConstruction();		
+				if ( !base_building )
+					return false;
+				Construction construction = base_building.GetConstruction();
+				if ( !construction )
+					return false;
 				ConstructionPart construction_part = construction.GetConstructionPartToDismantle( part_name, item );
 				
 				if ( construction_part )
