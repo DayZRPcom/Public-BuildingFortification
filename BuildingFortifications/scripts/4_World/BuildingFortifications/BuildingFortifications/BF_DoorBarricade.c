@@ -244,6 +244,9 @@ class BF_DoorBarricade extends BuildingFortficationsCore
 	override bool CanDisplayAttachmentCategory(string category_name) 
 	{	
 		PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
+		// No local player on a dedicated server: skip the inside check there.
+		if (!player)
+			return super.CanDisplayAttachmentCategory(category_name);
 		if(IsPlayerInside(player,"") == true)
 		{
 			if (category_name == "Base" && !HasBase())
