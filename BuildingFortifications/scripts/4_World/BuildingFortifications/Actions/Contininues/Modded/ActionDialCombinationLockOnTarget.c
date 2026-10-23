@@ -32,6 +32,9 @@ modded class ActionDialCombinationLockOnTarget
 		}
 
 		combination_lock.DialNextNumber();
+		// 1.30's DialNextNumber no longer re-checks the locked state (its own unlock
+		// action does); without this the right code never opens the lock.
+		combination_lock.CheckLockedStateServer();
 		if ( !combination_lock.IsLockedOnGate() )
 			combination_lock.UnlockServer( action_data.m_Player, combination_lock.GetHierarchyParent() );
 	}

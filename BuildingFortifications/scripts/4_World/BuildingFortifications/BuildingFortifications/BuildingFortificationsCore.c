@@ -119,7 +119,9 @@ class BuildingFortficationsCore extends BaseBuildingBase
 		return "WindowBarricadeKit";
 	}
 	
-	override bool CanDisplayAttachmentSlot(string slot_name)
+	// DayZRP fork: the inventory only calls the slot-id form (the string form is
+	// obsolete on 1.30 and was never called).
+	override bool CanDisplayAttachmentSlot(int slot_id)
 	{
 		return true;
 	}

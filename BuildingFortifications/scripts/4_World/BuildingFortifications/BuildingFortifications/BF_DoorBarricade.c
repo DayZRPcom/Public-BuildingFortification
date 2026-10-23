@@ -184,10 +184,12 @@ class BF_DoorBarricade extends BuildingFortficationsCore
 	}
 	
 	
-	override bool CanDisplayAttachmentSlot( string slot_name )
+	override bool CanDisplayAttachmentSlot( int slot_id )
 	{
-		if (!super.CanDisplayAttachmentSlot(slot_name))
+		if (!super.CanDisplayAttachmentSlot(slot_id))
 			return false;
+		
+		string slot_name = InventorySlots.GetSlotName(slot_id);
 		
 		if ( slot_name == "Att_CombinationLock" )
 		{
