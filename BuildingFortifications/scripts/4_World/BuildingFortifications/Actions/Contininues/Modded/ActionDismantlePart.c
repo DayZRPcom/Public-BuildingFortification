@@ -26,6 +26,24 @@ modded class ActionDismantlePart
 					return false;
 				ConstructionPart construction_part = construction.GetConstructionPartToDismantle( part_name, item );
 				
+				//The hinge wire on a BF door sits behind its other parts, so the cursor can rarely reach it.
+				//When the tool in hand dismantles nothing under the cursor, offer the hinges instead; every check below still applies.
+				if ( !construction_part )
+				{
+					string hinge_part = "";
+					if ( BF_DoorBarricade.Cast( base_building ) )
+						hinge_part = "i_hindges";
+					else if ( BF_DoubleDoorBarricade.Cast( base_building ) )
+						hinge_part = "h_hindges";
+					
+					if ( hinge_part != "" )
+					{
+						construction_part = construction.GetConstructionPartToDismantle( hinge_part, item );
+						if ( construction_part )
+							part_name = hinge_part;
+					}
+				}
+				
 				if ( construction_part )
 				{
 					/*Print("DismantleCondition");
